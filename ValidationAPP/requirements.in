@@ -1,0 +1,24 @@
+fastapi
+mangum
+uvicorn
+pre-commit
+SQLAlchemy
+pycryptodome
+jwt
+email-validator
+requests
+tenacity
+pydantic
+emails
+psycopg2-binary
+alembic
+pytest
+python-jose
+python-multipart
+black
+# to add pre commit hook
+pre-commit
+boto3
+python-dotenv
+jinja2
+starlette_context

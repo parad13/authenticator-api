@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for Moderator apis
+
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+  VpcSubnetIds:
+    Type: List<String>
+
+  VpcSecurityGroups:
+    Type: List<String>
+
+  ReportDbUser:
+    Type: String
+
+  ReportDbPassowrd:
+    Type: String
+
+  ReportDbHost:
+    Type: String
+
+  ReportDbName:
+    Type: String
+
+  BiobankRequestUrl:
+    Type: String
+
+  BiobankAuthToken:
+    Type: String
+
+  LambdaRole:
+    Type: String
+
+  ReportBucketName:
+    Type: String
+
+  ReportBucketRegion:
+    Type: String
+
+  EmailsFromEmail:
+    Type: String
+
+  SecretKey:
+    Type: String
+
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 300
+
+
+Resources:
+
+  ApiDeployment:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${Stage}-report-moderator-api"
+      StageName: !Ref Stage
+      OpenApiVersion: '2.0'
+
+  ReportModeratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-report-moderator"
+      CodeUri: ./moderator_handler
+      Handler: main.handler
+      Runtime: python3.9
+      AutoPublishAlias: prod
+      Role: !Ref LambdaRole
+      VpcConfig:
+        SecurityGroupIds: !Ref VpcSecurityGroups
+        SubnetIds: !Ref VpcSubnetIds
+      Environment:
+        Variables:
+          # REPORT_DB_USER: !Ref ReportDbUser
+          # REPORT_DB_PASSWORD: !Ref ReportDbPassowrd
+          # REPORT_DB_HOST: !Ref ReportDbHost
+          # REPORT_DB_NAME: !Ref ReportDbName
+          # BIOBANK_AUTH_TOKEN: !Ref BiobankAuthToken
+          # BIOBANK_REQUEST_URL: !Ref BiobankRequestUrl
+          # REPORT_BUCKET_NAME: !Ref ReportBucketName
+          # REPORT_BUCKET_REGION: !Ref ReportBucketRegion
+          # EMAILS_FROM_EMAIL: !Ref EmailsFromEmail
+          SECRET_KEY: !Ref SecretKey
+
+
+      Events:
+        ReportModerator:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+            RestApiId: !Ref ApiDeployment
+
+
+Outputs:
+  ReportModeratorFunctionArn:
+    Description: "Report Moderator function ARN"
+    Value: !GetAtt ReportModeratorFunction.Arn
+
+  ApiDeployment:
+    Description: "API Gateway endpoint URL for Prod stage for report moderator function"
+    Value: !Sub "https://${ApiDeployment}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
