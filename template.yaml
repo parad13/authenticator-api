@@ -56,7 +56,8 @@ Resources:
   ReportModeratorFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-report-moderator"
+      # FunctionName: !Sub "${Stage}-report-moderator"
+      FunctionName: !Sub "Lambda-function1"
       CodeUri: ./authenticator_handler
       Handler: main.handler
       Runtime: python3.9
