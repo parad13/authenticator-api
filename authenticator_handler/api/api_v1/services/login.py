@@ -64,7 +64,7 @@ def login_access_token(
         log_handler(e.detail, ErrorType.ERROR, request_payload=payload)
         db.rollback()
         raise
-    
+
     if not security.verify_password(form_data.client_secret, decrypted_secret):
         log_handler(INVALID_CREDENTIALS, ErrorType.ERROR, request_payload=str(payload))
         raise HTTPException(status_code=400, detail=INVALID_CREDENTIALS)

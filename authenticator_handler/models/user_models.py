@@ -25,13 +25,10 @@ class Item(Base):
 
     owner = relationship("User", back_populates="items")
 
+
 class Token(Base):
-     __tablename__ = "tokens"
+    __tablename__ = "tokens"
 
-     id = Column(Integer, primary_key=True, index=True)
-     access_token = Column(String, index=True)
-     token_type = Column(String, index=True)
-
-
-
-
+    id = Column(Integer, primary_key=True, index=True)
+    access_token = Column(String, index=True)
+    token_type = Column(String, index=True)

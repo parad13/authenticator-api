@@ -17,12 +17,15 @@ class CRUDUsClientCredentials(
         self, db: Session, *, client_credentials: ClientCredentialsFetch
     ) -> Optional[ClientCredentials]:
         is_active = True
-        client_cred  =db.query(ClientCredentials).filter(
+        client_cred = (
+            db.query(ClientCredentials)
+            .filter(
                 ClientCredentials.client_id == client_credentials.client_id,
                 ClientCredentials.is_active == is_active,
-            ).first()
-        return (client_cred)
-            
+            )
+            .first()
+        )
+        return client_cred
 
 
 client_credentials = CRUDUsClientCredentials(ClientCredentials)

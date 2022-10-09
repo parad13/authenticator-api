@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from enum import Enum
 
 from api import deps
 from schemas import client_credentials
@@ -9,19 +8,18 @@ from schemas.client_schema import Client
 
 router = APIRouter()
 
+
 @router.get("/", response_model=list[Client])
-def read_clients(db: Session = Depends(deps.get_db), token = Depends()):
+def read_clients(db: Session = Depends(deps.get_db), token=Depends()):
     clients = client_crud.get_clients(db)
     return clients
+
 
 @router.post("/")
 def create_client(client: Client, db: Session = Depends(deps.get_db)):
     db_client = client_crud.get_client_by_cid(db, client.client_id)
     if db_client:
-        raise HTTPException(
-            status_code=400, 
-            detail="Client already present"
-        )
+        raise HTTPException(status_code=400, detail="Client already present")
     return client_crud.create_client(db, client)
 
 
@@ -30,7 +28,7 @@ def create_client(client: Client, db: Session = Depends(deps.get_db)):
 #     db_client = client_crud.get_client_by_client_id(db, clientid=user.clientid)
 #     if db_user:
 #         raise HTTPException(
-#             status_code=400, 
+#             status_code=400,
 #             detail="Client already present"
 #         )
 #     return db_client
@@ -41,4 +39,3 @@ def create_client(client: Client, db: Session = Depends(deps.get_db)):
 #     if db_user:
 #         return "User already registered"
 #     return user_crud.create_user(db, user)
-

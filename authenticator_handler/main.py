@@ -3,14 +3,12 @@ from fastapi.openapi.utils import get_openapi
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-# from starlette_context import context
-# from starlette_context.middleware import RawContextMiddleware
-
 from core.config import settings
 from api.api_v1.router import router as api_router
 from models import Base
 from db_pg.session import engine
 from mangum import Mangum
+
 from starlette.middleware import Middleware
 from starlette_context import context, plugins
 from starlette_context.middleware import RawContextMiddleware
