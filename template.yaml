@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  SAM Template for Moderator apis
+  SAM Template for Ms Authenticator API
 
 
 Parameters:
@@ -46,19 +46,18 @@ Globals:
 
 Resources:
 
-  ApiDeployment:
+  MsAuthenticatorAPI:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub "${Stage}-report-moderator-api"
+      Name: !Sub "${Stage}-ms-authenticator-api"
       StageName: !Ref Stage
       OpenApiVersion: '2.0'
 
-  ReportModeratorFunction:
+  MsAuthenticatorFunction:
     Type: AWS::Serverless::Function
     Properties:
-      # FunctionName: !Sub "${Stage}-report-moderator"
-      FunctionName: !Sub "Lambda-function1"
-      CodeUri: ./authenticator_handler
+      FunctionName: !Sub "${Stage}-ms-authenticator-function"
+      CodeUri: ./ms_authenticator_handler
       Handler: main.handler
       Runtime: python3.9
       AutoPublishAlias: prod
@@ -76,19 +75,19 @@ Resources:
 
 
       Events:
-        ReportModerator:
+        MsAuthenticator:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /{proxy+}
             Method: any
-            RestApiId: !Ref ApiDeployment
+            RestApiId: !Ref MsAuthenticatorAPI
 
 
 Outputs:
-  ReportModeratorFunctionArn:
-    Description: "Report Moderator function ARN"
-    Value: !GetAtt ReportModeratorFunction.Arn
+  MsAuthenticatorFunctionArn:
+    Description: "Ms Authnticator function ARN"
+    Value: !GetAtt MsAuthenticatorFunction.Arn
 
-  ApiDeployment:
-    Description: "API Gateway endpoint URL for Prod stage for report moderator function"
-    Value: !Sub "https://${ApiDeployment}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
+  MsAuthenticatorAPI:
+    Description: "API Gateway endpoint URL for Prod stage for Ms Authnticator function"
+    Value: !Sub "https://${MsAuthenticatorAPI}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"

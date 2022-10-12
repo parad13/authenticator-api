@@ -12,20 +12,28 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     # SECRET_KEY: str = secrets.token_urlsafe(32)
     SECRET_KEY: str
+    
+
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     ALLOWED_APPS = ["LA", "MD"]
     GRANT_TYPE = "client_credentials"
-    REPORT_BUCKET_NAME: str = os.environ.get("REPORT_BUCKET_NAME")
-    REPORT_BUCKET_REGION: str = os.environ.get("REPORT_BUCKET_REGION")
+    # REPORT_BUCKET_NAME: str = os.environ.get("REPORT_BUCKET_NAME")
+    # REPORT_BUCKET_REGION: str = os.environ.get("REPORT_BUCKET_REGION")
     BACKEND_CORS_ORIGINS: list[Any] = [
         "*",
     ]
+    print(os.environ.get("LIMS_REGION"), "Region")
+    # LIMS_REGION: str = os.environ.get("LIMS_REGION")
+    OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "output_folder")
+    LIMS_OUTPUT_BUCKET_NAME = os.environ.get("LIMS_OUTPUT_BUCKET_NAME", "bucket")
+    
+    LIMS_REGION: str = "us-east-1"
     REPORT_DEBUG: boolean = os.environ.get("REPORT_DEBUG") == "True"
-    REPORT_DB_HOST: str
-    REPORT_DB_USER: str
-    REPORT_DB_PASSWORD: str
-    REPORT_DB_NAME: str
+    CLIENT_DB_USER: str 
+    CLIENT_DB_PASSWORD: str 
+    CLIENT_DB_HOST: str 
+    CLIENT_DB_NAME: str 
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
     # mail credentials
@@ -39,12 +47,13 @@ class Settings(BaseSettings):
     def assemble_db_connection(cls, v: Optional[str], values: dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
+        decrypted_password = decrypt(values.get("CLIENT_DB_PASSWORD"), values.get("SECRET_KEY"))
         return PostgresDsn.build(
             scheme="postgresql",
-            user=values.get("REPORT_DB_USER"),
-            password=values.get("REPORT_DB_PASSWORD"),
-            host=values.get("REPORT_DB_HOST"),
-            path=f"/{values.get('REPORT_DB_NAME') or ''}",
+            user=values.get("CLIENT_DB_USER"),
+            password=decrypted_password,
+            host=values.get("CLIENT_DB_HOST"),
+            path=f"/{values.get('CLIENT_DB_NAME') or ''}",
         )
 
 

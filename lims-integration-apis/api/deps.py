@@ -83,4 +83,12 @@ def token_filter(token: str = Depends(reusable_oauth2)) -> bool:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=INVALID_SIGNATURE,
         )
+    # print(payload.get("role"), settings.ALLOWED_APPS)
+    role_exists = any(x in payload.get("role") for x in settings.ALLOWED_APPS)
+    # print(role_exists)
+    if not role_exists:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorised to use this service",
+        )
     return payload
