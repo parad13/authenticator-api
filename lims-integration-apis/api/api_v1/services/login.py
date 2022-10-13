@@ -46,7 +46,6 @@ class OAuth2ClientCredentialsRequestForm:
 )
 def login_access_token(
     *,
-    Authorize: AuthJWT = Depends(),
     db: Session = Depends(deps.get_db),
     form_data: OAuth2ClientCredentialsRequestForm = Depends(),
 ) -> Any:
@@ -73,11 +72,11 @@ def login_access_token(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    access_token = Authorize.create_access_token(subject=user.username, algorithm=ALGORITHM, expires_time=access_token_expires)
+    # access_token = Authorize.create_access_token(subject=user.username, algorithm=ALGORITHM, expires_time=access_token_expires)
 
-    return {"access_token": access_token,"token_type":"Bearer"}
+    # return {"access_token": access_token,"token_type":"Bearer"}
 
-    # return {
-    #     "access_token": security.create_access_token(role, 1, expires_delta=access_token_expires),
-    #     "token_type": "bearer",
-    # }
+    return {
+        "access_token": security.create_access_token(role, 1, expires_delta=access_token_expires),
+        "token_type": "bearer",
+    }

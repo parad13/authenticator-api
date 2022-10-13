@@ -51,10 +51,10 @@ def access_revoke(Authorize: AuthJWT = Depends()):
 @router.post("/upload_file/")
 async def create_upload_file(
     file: UploadFile,
-    Authorize: AuthJWT = Depends(),
+    # Authorize: AuthJWT = Depends(),
     token: bool = Depends(deps.token_filter),
 ):
-    Authorize.jwt_required()
+    # Authorize.jwt_required()
     lims_output_folder_name = settings.OUTPUT_FOLDER
     file_name = file.filename
     try:
