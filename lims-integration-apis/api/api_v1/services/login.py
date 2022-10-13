@@ -6,20 +6,24 @@ from fastapi.param_functions import Form
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
-
 import crud
 from core.logger_config import ErrorType, log_handler
 from helper.crypto_handler import decrypt
 from schemas import Token
 from api import deps
 from core import security
+from jose import jwt
+# from core.security import AuthJWT
+# from core.security import AuthJWT
+from core import auth_jwt
 from core.config import settings
+from pydantic import BaseModel
 
 
 router = APIRouter()
 
 INVALID_CREDENTIALS = "Invalid credentials"
-
+ALGORITHM="HS256"
 
 class OAuth2ClientCredentialsRequestForm:
     """
@@ -46,6 +50,7 @@ class OAuth2ClientCredentialsRequestForm:
 )
 def login_access_token(
     *,
+    Authorize: auth_jwt.AuthJWT = Depends(),
     db: Session = Depends(deps.get_db),
     form_data: OAuth2ClientCredentialsRequestForm = Depends(),
 ) -> Any:
@@ -58,7 +63,6 @@ def login_access_token(
         log_handler(INVALID_CREDENTIALS, ErrorType.ERROR, request_payload=str(payload))
         raise HTTPException(status_code=400, detail=INVALID_CREDENTIALS)
     role = app_client.role
-    print(role, "role from db")
     try:
         decrypted_secret = decrypt(app_client.client_secret, settings.SECRET_KEY)
     except HTTPException as e:
@@ -70,13 +74,18 @@ def login_access_token(
         log_handler(INVALID_CREDENTIALS, ErrorType.ERROR, request_payload=str(payload))
         raise HTTPException(status_code=400, detail=INVALID_CREDENTIALS)
 
+    # jti = AuthJWT.jti_value()
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    # access_token = Authorize.create_access_token(subject=user.username, algorithm=ALGORITHM, expires_time=access_token_expires)
+    # access_token = Authorize.create_access_token(subject="User", algorithm=ALGORITHM, expires_time=access_token_expires, audience=role)
 
+    access_token = security.create_access_token(role, 1, expires_time=access_token_expires)
+
+    # access_token = Authorize.create_access_token(role, 1, expires_delta=access_token_expires)
+
+    # print(jwt.decode(access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]))
+
+    return {"access_token": access_token,"token_type":"Bearer"}
+    # return "Hola Paras"
     # return {"access_token": access_token,"token_type":"Bearer"}
-
-    return {
-        "access_token": security.create_access_token(role, 1, expires_delta=access_token_expires),
-        "token_type": "bearer",
-    }

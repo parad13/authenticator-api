@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     # SECRET_KEY: str = secrets.token_urlsafe(32)
     SECRET_KEY: str
-    
+    ALGORITHM="HS256"
 
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[Any] = [
         "*",
     ]
-    print(os.environ.get("LIMS_REGION"), "Region")
+    # print(os.environ.get("LIMS_REGION"), "Region")
     # LIMS_REGION: str = os.environ.get("LIMS_REGION")
     OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "output_folder")
     LIMS_OUTPUT_BUCKET_NAME = os.environ.get("LIMS_OUTPUT_BUCKET_NAME", "bucket")

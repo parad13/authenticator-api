@@ -9,7 +9,6 @@ import utils
 from core.config import settings
 from core.logger_config import ErrorType, log_handler, logger
 from fastapi_jwt_auth import AuthJWT
-
 import os
 from fastapi import File, UploadFile
 import boto3
