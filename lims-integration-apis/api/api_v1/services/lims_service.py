@@ -8,14 +8,13 @@ import crud
 import utils
 from core.config import settings
 from core.logger_config import ErrorType, log_handler, logger
-from fastapi_jwt_auth import AuthJWT
 import os
 from fastapi import File, UploadFile
 import boto3
 import json
 from botocore.exceptions import ClientError
 from boto3.exceptions import S3UploadFailedError
-
+from fastapi_jwt_auth import AuthJWT
 import boto3
 from boto3.s3.transfer import TransferConfig
 from api.api_v1.services.multipart_s3_upload import upload_with_chunksize_and_meta
@@ -37,16 +36,7 @@ temp_dir = "/tmp"
 async def test():
     push_to_queue()
     return {"message": "Hello World"}
-
-# Endpoint for revoking the current users access token
-@router.delete('/access-revoke')
-def access_revoke(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
-
-    jti = Authorize.get_raw_jwt()['jti']
-    revoke_crud.denylist.add(jti)
-    return {"detail":"Access token has been revoke"}
-    
+ 
 @router.post("/upload_file/")
 async def create_upload_file(
     file: UploadFile,
@@ -54,6 +44,7 @@ async def create_upload_file(
     token: bool = Depends(deps.token_filter),
 ):
     # Authorize.jwt_required()
+
     lims_output_folder_name = settings.OUTPUT_FOLDER
     file_name = file.filename
     try:

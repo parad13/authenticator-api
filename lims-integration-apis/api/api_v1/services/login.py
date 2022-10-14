@@ -13,9 +13,9 @@ from schemas import Token
 from api import deps
 from core import security
 from jose import jwt
+from fastapi_jwt_auth import AuthJWT
 # from core.security import AuthJWT
-# from core.security import AuthJWT
-from core import auth_jwt
+# from core import auth_jwt
 from core.config import settings
 from pydantic import BaseModel
 
@@ -50,7 +50,7 @@ class OAuth2ClientCredentialsRequestForm:
 )
 def login_access_token(
     *,
-    Authorize: auth_jwt.AuthJWT = Depends(),
+    # Authorize: AuthJWT = Depends(),
     db: Session = Depends(deps.get_db),
     form_data: OAuth2ClientCredentialsRequestForm = Depends(),
 ) -> Any:
@@ -74,18 +74,10 @@ def login_access_token(
         log_handler(INVALID_CREDENTIALS, ErrorType.ERROR, request_payload=str(payload))
         raise HTTPException(status_code=400, detail=INVALID_CREDENTIALS)
 
-    # jti = AuthJWT.jti_value()
-
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-
-    # access_token = Authorize.create_access_token(subject="User", algorithm=ALGORITHM, expires_time=access_token_expires, audience=role)
 
     access_token = security.create_access_token(role, 1, expires_time=access_token_expires)
 
-    # access_token = Authorize.create_access_token(role, 1, expires_delta=access_token_expires)
-
-    # print(jwt.decode(access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]))
+    # access_token = Authorize.create_access_token(1, expires_time=access_token_expires, user_claims={"role":role})
 
     return {"access_token": access_token,"token_type":"Bearer"}
-    # return "Hola Paras"
-    # return {"access_token": access_token,"token_type":"Bearer"}

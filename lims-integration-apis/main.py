@@ -12,8 +12,9 @@ from mangum import Mangum
 from starlette.middleware import Middleware
 from starlette_context import context, plugins
 from starlette_context.middleware import RawContextMiddleware
-
+from fastapi_jwt_auth import AuthJWT
 from core.logger_config import logger
+from pydantic import BaseModel
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,6 +25,20 @@ middleware = [
 ]
 
 app = FastAPI(middleware=middleware)
+
+# set denylist enabled to True
+# you can set to check access or refresh token or even both of them
+class Settings(BaseModel):
+    authjwt_secret_key: str = "secret"
+    authjwt_denylist_enabled: bool = True
+    authjwt_denylist_token_checks: set = {"access","refresh"}
+
+@AuthJWT.load_config
+def get_config():
+    return Settings()
+
+# app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+# jwt = JWTManager(app)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 handler = Mangum(app)
@@ -53,3 +68,7 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
+
+
+# Centralised authentication api
+# Logging and monitarisation 

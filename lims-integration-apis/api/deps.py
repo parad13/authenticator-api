@@ -9,7 +9,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 from jose import jwt
 from starlette_context import context
 
-from core import security
+# from core import security
 from core.config import settings
 from db_pg.session import SessionLocal
 from core.logger_config import ErrorType, log_handler
@@ -70,7 +70,7 @@ def get_db() -> Generator:
 
 def token_filter(token: str = Depends(reusable_oauth2)) -> bool:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     except jwt.ExpiredSignatureError:
         log_handler(TOKEN_EXPIRED, ErrorType.ERROR, context.data["X-Request-ID"])
         raise HTTPException(
@@ -83,12 +83,14 @@ def token_filter(token: str = Depends(reusable_oauth2)) -> bool:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=INVALID_SIGNATURE,
         )
-    # print(payload.get("role"), settings.ALLOWED_APPS)
+
     role_exists = any(x in payload.get("role") for x in settings.ALLOWED_APPS)
-    # print(role_exists)
+    
     if not role_exists:
         raise HTTPException(
             status_code=403,
             detail="Not authorised to use this service",
         )
     return payload
+
+
