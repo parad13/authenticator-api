@@ -14,8 +14,7 @@ from core.config import settings
 ALGORITHM = config("ALGORITHM")
 
 def get_jwt_identifier() -> str:
-        return str(uuid.uuid4())
-
+        return str(uuid.uuid4())  
 
 def create_access_token(
     role, 
