@@ -16,13 +16,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     ALLOWED_APPS = ["LA", "MD"]
     GRANT_TYPE = "client_credentials"
+    LIMS_OUTPUT_BUCKET_NAME = os.environ.get("LIMS_OUTPUT_BUCKET_NAME", "bucket")
+    ML_QUEUE_NAME = os.environ.get("ML_QUEUE_NAME", "queue_name")
+    OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "output_folder")
+    LIMS_REGION="us-east-1"
     BACKEND_CORS_ORIGINS: list[Any] = [
         "*",
     ]
-    OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "output_folder")
-    LIMS_OUTPUT_BUCKET_NAME = os.environ.get("LIMS_OUTPUT_BUCKET_NAME", "bucket")
-
-    LIMS_REGION: str = "us-east-1"
+    LIMS_DEBUG: boolean = os.environ.get("LIMS_DEBUG") == "True"
+    
     REPORT_DEBUG: boolean = os.environ.get("REPORT_DEBUG") == "True"
 
     CLIENT_DB_USER: str
