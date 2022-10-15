@@ -1,13 +1,15 @@
 from typing import Generator, Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.exceptions import HTTPException
+# from fastapi.exceptions import HTTPException
 from fastapi.security.oauth2 import OAuth2, OAuthFlowsModel
 from fastapi.security.utils import get_authorization_scheme_param
 from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 from jose import jwt
+import jose
 from starlette_context import context
+import fastapi_jwt_auth
 
 # from core import security
 from core.config import settings
@@ -71,18 +73,39 @@ def get_db() -> Generator:
 def token_filter(token: str = Depends(reusable_oauth2)) -> bool:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+
     except jwt.ExpiredSignatureError:
         log_handler(TOKEN_EXPIRED, ErrorType.ERROR, context.data["X-Request-ID"])
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Token has expired",
         )
+
     except jwt.JWTError:
         log_handler(INVALID_SIGNATURE, ErrorType.ERROR, context.data["X-Request-ID"])
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=INVALID_SIGNATURE,
         )
+
+    except fastapi_jwt_auth.exceptions.RevokedTokenError:
+         raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="token_filter : Token has been revoked",
+        )
+
+    except jose.exceptions.JWTClaimsError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="jose.exceptions.JWTClaimsError : Subject must be a string",
+        )
+
+
+    # except jose.exceptions.JWTClaimsError:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="token_filter : Invalid Token",
+    #     )
 
     role_exists = any(x in payload.get("role") for x in settings.ALLOWED_APPS)
     

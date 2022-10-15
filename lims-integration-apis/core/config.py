@@ -10,8 +10,8 @@ from helper.crypto_handler import decrypt
 class Settings(BaseSettings):
 
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str
-    ALGORITHM="HS256"
+    SECRET_KEY: str = os.environ.get("SECRET_KEY")
+    ALGORITHM = "HS256"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     ALLOWED_APPS = ["LA", "MD"]
@@ -24,15 +24,12 @@ class Settings(BaseSettings):
     
     LIMS_REGION: str = "us-east-1"
     REPORT_DEBUG: boolean = os.environ.get("REPORT_DEBUG") == "True"
+    
     CLIENT_DB_USER: str 
     CLIENT_DB_PASSWORD: str 
     CLIENT_DB_HOST: str 
     CLIENT_DB_NAME: str 
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
-
-    # mail credentials
-    # EMAILS_FROM_EMAIL: str
-    EMAIL_TEMPLATES_DIR: str = "email-templates/build"
 
     class Config:
         env_file = ".env"

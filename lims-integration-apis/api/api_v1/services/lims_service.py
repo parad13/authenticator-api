@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from fastapi import APIRouter, Depends, HTTPException, Query, Body, status
 import requests
 from schemas import report
 from api import deps
@@ -15,6 +15,7 @@ import json
 from botocore.exceptions import ClientError
 from boto3.exceptions import S3UploadFailedError
 from fastapi_jwt_auth import AuthJWT
+import fastapi_jwt_auth
 import boto3
 from boto3.s3.transfer import TransferConfig
 from api.api_v1.services.multipart_s3_upload import upload_with_chunksize_and_meta
@@ -40,30 +41,36 @@ async def test():
 @router.post("/upload_file/")
 async def create_upload_file(
     file: UploadFile,
-    # Authorize: AuthJWT = Depends(),
+    Authorize: AuthJWT = Depends(),
     token: bool = Depends(deps.token_filter),
 ):
-    # Authorize.jwt_required()
-
-    lims_output_folder_name = settings.OUTPUT_FOLDER
-    file_name = file.filename
     try:
-        contents = file.file.read()
-        file_path = f"{temp_dir}/{file_name}"
-        with open(file_path, "wb") as f:
-            f.write(contents)
-    except Exception:
-        return {"message": "There was an error uploading the file"}
-    finally:
-        file.file.close()
-    upload_to_s3(file_path, file_name, lims_output_folder_name)
-    # upload_multipart_to_s3(file_path, file_name, lims_output_folder_name)
-    listdir = os.listdir(temp_dir)
-    logger.info(listdir)
-    # Get the queue. This returns an SQS.Queue instance
-    # queue = sqs.get_queue_by_name(QueueName=settings.ML_QUEUE_NAME)
-    # queue.send_message(MessageBody=json.dumps({"filename": file_name}))
-    return {"filename": file_name}
+        Authorize.jwt_required()
+
+        lims_output_folder_name = settings.OUTPUT_FOLDER
+        file_name = file.filename
+        try:
+            contents = file.file.read()
+            file_path = f"{temp_dir}/{file_name}"
+            with open(file_path, "wb") as f:
+                f.write(contents)
+        except Exception:
+            return {"message": "There was an error uploading the file"}
+        finally:
+            file.file.close()
+        upload_to_s3(file_path, file_name, lims_output_folder_name)
+        # upload_multipart_to_s3(file_path, file_name, lims_output_folder_name)
+        listdir = os.listdir(temp_dir)
+        logger.info(listdir)
+        # Get the queue. This returns an SQS.Queue instance
+        # queue = sqs.get_queue_by_name(QueueName=settings.ML_QUEUE_NAME)
+        # queue.send_message(MessageBody=json.dumps({"filename": file_name}))
+        return {"filename": file_name}
+    except fastapi_jwt_auth.exceptions.RevokedTokenError:
+        raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Token has been revoked",
+    )
 
 
 def push_to_queue() -> None:

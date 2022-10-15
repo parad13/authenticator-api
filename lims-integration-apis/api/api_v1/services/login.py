@@ -11,11 +11,8 @@ from core.logger_config import ErrorType, log_handler
 from helper.crypto_handler import decrypt
 from schemas import Token
 from api import deps
-from core import security
 from jose import jwt
 from fastapi_jwt_auth import AuthJWT
-# from core.security import AuthJWT
-# from core import auth_jwt
 from core.config import settings
 from pydantic import BaseModel
 
@@ -50,7 +47,7 @@ class OAuth2ClientCredentialsRequestForm:
 )
 def login_access_token(
     *,
-    # Authorize: AuthJWT = Depends(),
+    Authorize: AuthJWT = Depends(),
     db: Session = Depends(deps.get_db),
     form_data: OAuth2ClientCredentialsRequestForm = Depends(),
 ) -> Any:
@@ -76,8 +73,8 @@ def login_access_token(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    access_token = security.create_access_token(role, 1, expires_time=access_token_expires)
+    # access_token = security.create_access_token(role, 1, expires_time=access_token_expires)
 
-    # access_token = Authorize.create_access_token(1, expires_time=access_token_expires, user_claims={"role":role})
+    access_token = Authorize.create_access_token("subject", expires_time=access_token_expires, user_claims={"role":role})
 
     return {"access_token": access_token,"token_type":"Bearer"}
