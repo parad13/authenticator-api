@@ -20,8 +20,6 @@ from pydantic import BaseModel
 router = APIRouter()
 
 INVALID_CREDENTIALS = "Invalid credentials"
-ALGORITHM = "HS256"
-
 
 class OAuth2ClientCredentialsRequestForm:
     """
@@ -60,7 +58,6 @@ def login_access_token(
     if not app_client:
         log_handler(INVALID_CREDENTIALS, ErrorType.ERROR, request_payload=str(payload))
         raise HTTPException(status_code=400, detail=INVALID_CREDENTIALS)
-    role = app_client.role
     try:
         decrypted_secret = decrypt(app_client.client_secret, settings.SECRET_KEY)
     except HTTPException as e:
@@ -71,9 +68,14 @@ def login_access_token(
     if form_data.client_secret != decrypted_secret:
         log_handler(INVALID_CREDENTIALS, ErrorType.ERROR, request_payload=str(payload))
         raise HTTPException(status_code=400, detail=INVALID_CREDENTIALS)
-
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    role = app_client.role
     access_token = Authorize.create_access_token(
-        "subject", expires_time=access_token_expires, user_claims={"role": role}
+        "subject", 
+        expires_time=access_token_expires, 
+        user_claims={"role": role}
     )
-    return {"access_token": access_token, "token_type": "Bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "Bearer"
+    }
