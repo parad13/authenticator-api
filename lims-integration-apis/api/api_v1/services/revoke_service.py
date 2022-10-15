@@ -5,19 +5,19 @@ import fastapi_jwt_auth
 
 router = APIRouter()
 
-@router.delete('/access-revoke')
+
+@router.delete("/access-revoke")
 def access_revoke(Authorize: AuthJWT = Depends()):
     try:
 
         Authorize.jwt_required()
 
-        jti = Authorize.get_raw_jwt()['jti']
+        jti = Authorize.get_raw_jwt()["jti"]
         revoke_crud.denylist.add(jti)
-        return {"detail":"Token has been revoked"}
-    
+        return {"detail": "Token has been revoked"}
 
     except fastapi_jwt_auth.exceptions.RevokedTokenError:
         raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="Token has been revoked",
-    )
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token has been revoked",
+        )

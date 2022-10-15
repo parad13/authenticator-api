@@ -29,7 +29,6 @@ app = FastAPI(middleware=middleware)
 app.include_router(api_router, prefix=settings.API_V1_STR)
 handler = Mangum(app)
 
-# Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
@@ -54,6 +53,3 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
-
-
-

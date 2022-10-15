@@ -21,14 +21,14 @@ class Settings(BaseSettings):
     ]
     OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "output_folder")
     LIMS_OUTPUT_BUCKET_NAME = os.environ.get("LIMS_OUTPUT_BUCKET_NAME", "bucket")
-    
+
     LIMS_REGION: str = "us-east-1"
     REPORT_DEBUG: boolean = os.environ.get("REPORT_DEBUG") == "True"
-    
-    CLIENT_DB_USER: str 
-    CLIENT_DB_PASSWORD: str 
-    CLIENT_DB_HOST: str 
-    CLIENT_DB_NAME: str 
+
+    CLIENT_DB_USER: str
+    CLIENT_DB_PASSWORD: str
+    CLIENT_DB_HOST: str
+    CLIENT_DB_NAME: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
     class Config:

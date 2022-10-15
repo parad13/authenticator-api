@@ -1,7 +1,6 @@
 from typing import Generator, Optional
 
 from fastapi import Depends, HTTPException, status
-# from fastapi.exceptions import HTTPException
 from fastapi.security.oauth2 import OAuth2, OAuthFlowsModel
 from fastapi.security.utils import get_authorization_scheme_param
 from starlette.requests import Request
@@ -11,7 +10,6 @@ import jose
 from starlette_context import context
 import fastapi_jwt_auth
 
-# from core import security
 from core.config import settings
 from db_pg.session import SessionLocal
 from core.logger_config import ErrorType, log_handler
@@ -89,7 +87,7 @@ def token_filter(token: str = Depends(reusable_oauth2)) -> bool:
         )
 
     except fastapi_jwt_auth.exceptions.RevokedTokenError:
-         raise HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="token_filter : Token has been revoked",
         )
@@ -100,20 +98,11 @@ def token_filter(token: str = Depends(reusable_oauth2)) -> bool:
             detail="jose.exceptions.JWTClaimsError : Subject must be a string",
         )
 
-
-    # except jose.exceptions.JWTClaimsError:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="token_filter : Invalid Token",
-    #     )
-
     role_exists = any(x in payload.get("role") for x in settings.ALLOWED_APPS)
-    
+
     if not role_exists:
         raise HTTPException(
             status_code=403,
             detail="Not authorised to use this service",
         )
     return payload
-
-

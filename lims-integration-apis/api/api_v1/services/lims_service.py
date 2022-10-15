@@ -37,7 +37,8 @@ temp_dir = "/tmp"
 async def test():
     push_to_queue()
     return {"message": "Hello World"}
- 
+
+
 @router.post("/upload_file/")
 async def create_upload_file(
     file: UploadFile,
@@ -59,23 +60,18 @@ async def create_upload_file(
         finally:
             file.file.close()
         upload_to_s3(file_path, file_name, lims_output_folder_name)
-        # upload_multipart_to_s3(file_path, file_name, lims_output_folder_name)
         listdir = os.listdir(temp_dir)
         logger.info(listdir)
-        # Get the queue. This returns an SQS.Queue instance
-        # queue = sqs.get_queue_by_name(QueueName=settings.ML_QUEUE_NAME)
-        # queue.send_message(MessageBody=json.dumps({"filename": file_name}))
         return {"filename": file_name}
     except fastapi_jwt_auth.exceptions.RevokedTokenError:
         raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="Token has been revoked",
-    )
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token has been revoked",
+        )
 
 
 def push_to_queue() -> None:
 
-    # Get the queue. This returns an SQS.Queue instance
     print("queue")
     print(settings.ML_QUEUE_NAME)
     queue = sqs.get_queue_by_name(QueueName=settings.ML_QUEUE_NAME)
