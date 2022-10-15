@@ -19,12 +19,12 @@ class Settings(BaseSettings):
     LIMS_OUTPUT_BUCKET_NAME = os.environ.get("LIMS_OUTPUT_BUCKET_NAME", "bucket")
     ML_QUEUE_NAME = os.environ.get("ML_QUEUE_NAME", "queue_name")
     OUTPUT_FOLDER = os.environ.get("OUTPUT_FOLDER", "output_folder")
-    LIMS_REGION="us-east-1"
+    LIMS_REGION = "us-east-1"
     BACKEND_CORS_ORIGINS: list[Any] = [
         "*",
     ]
     LIMS_DEBUG: boolean = os.environ.get("LIMS_DEBUG") == "True"
-    
+
     REPORT_DEBUG: boolean = os.environ.get("REPORT_DEBUG") == "True"
 
     CLIENT_DB_USER: str
