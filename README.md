@@ -1,6 +1,16 @@
 # Introduction
 TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.
 
+# How to run the project
+1. Install python 3.9
+2. create a new python virtual environment
+3. Activate the virtual environment
+4. cd lims-integration-apis/
+5. pip install pip-tools
+6. pip-compile
+7. pip-sync
+8. uvicorn main:app --reload
+
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
 1.	Installation process
